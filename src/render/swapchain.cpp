@@ -1,15 +1,5 @@
 #include "render.h"
 
-vk::Extent2D getWindowSize(SDL_Window* window) {
-    int width, height;
-    SDL_GetWindowSizeInPixels(window, &width, &height);
-
-    return vk::Extent2D {
-        static_cast<uint32_t>(width),
-        static_cast<uint32_t>(height)
-    };
-}
-
 void Render::createSwapchain() {
     m_Logger.info("Creating Swapchain");
 

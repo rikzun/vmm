@@ -1,7 +1,8 @@
 ﻿cmake_minimum_required(VERSION 3.29)
-include(CMakeDeclares)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(vmm VERSION 0.0.1)
+include(CMakeDeclares)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,7 +23,7 @@ file(GLOB_RECURSE PROJECT_SOURCE_FILES "src/*.cpp")
 file(GLOB_RECURSE PROJECT_HEADER_DIRS "src/*.h")
 
 set(INCLUDE_DIRS "")
-foreach(HEADER ${HEADER_PATHS})
+foreach(HEADER ${PROJECT_HEADER_DIRS})
     get_filename_component(DIR ${HEADER} DIRECTORY)
     list(APPEND INCLUDE_DIRS ${DIR})
 endforeach()
@@ -49,13 +50,15 @@ if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
     set_target_properties(vmm PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 endif()
 
-target_compile_definitions(vmm PRIVATE PROJECT_NAME="${CMAKE_PROJECT_NAME}")
-target_compile_definitions(vmm PRIVATE PROJECT_VERSION_MAJOR=${PROJECT_VERSION_MAJOR})
-target_compile_definitions(vmm PRIVATE PROJECT_VERSION_MINOR=${PROJECT_VERSION_MINOR})
-target_compile_definitions(vmm PRIVATE PROJECT_VERSION_PATCH=${PROJECT_VERSION_PATCH})
-target_compile_definitions(vmm PRIVATE PROJECT_VK_VERSION_MAJOR=1)
-target_compile_definitions(vmm PRIVATE PROJECT_VK_VERSION_MINOR=3)
-target_compile_definitions(vmm PRIVATE PROJECT_VK_VERSION_PATCH=204)
+target_compile_definitions(vmm PRIVATE
+    PROJECT_NAME="${CMAKE_PROJECT_NAME}"
+    PROJECT_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
+    PROJECT_VERSION_MINOR=${PROJECT_VERSION_MINOR}
+    PROJECT_VERSION_PATCH=${PROJECT_VERSION_PATCH}
+    PROJECT_VK_VERSION_MAJOR=1
+    PROJECT_VK_VERSION_MINOR=3
+    PROJECT_VK_VERSION_PATCH=204
+)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(vmm PRIVATE DEBUG_BUILD)
@@ -70,3 +73,11 @@ elseif(APPLE)
 elseif(UNIX)
     target_compile_definitions(vmm PRIVATE LINUX_BUILD)
 endif()
+
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+    ${CMAKE_BINARY_DIR}/compile_commands.json
+    ${CMAKE_SOURCE_DIR}/compile_commands.json
+    RESULT_VARIABLE result
+    ERROR_VARIABLE error
+)

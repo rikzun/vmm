@@ -1,4 +1,6 @@
 #include "render.h"
+#include "render_utils.h"
+#include <unordered_set>
 
 void Render::createInstance() {
     m_Logger.info("Creating Instance");

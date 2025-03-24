@@ -6,9 +6,9 @@ void Render::createSyncObjects() {
         "m_ImageAvailableSemaphore"
     );
 
-    m_RenderFinishedSemaphore = VK_ERROR_CHECK(
+    m_SubmitSemaphore = VK_ERROR_CHECK(
         m_LogicalDevice.createSemaphore(vk::SemaphoreCreateInfo {}),
-        "m_RenderFinishedSemaphore"
+        "m_SubmitSemaphore"
     );
 
     m_RenderFinishedFence = VK_ERROR_CHECK(

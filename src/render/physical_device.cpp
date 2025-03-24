@@ -1,4 +1,6 @@
 #include "render.h"
+#include "render_utils.h"
+#include <unordered_set>
 
 void Render::selectPhysicalDevice() {
     m_Logger.info("Select Physical Device");
@@ -10,8 +12,7 @@ void Render::selectPhysicalDevice() {
     );
 
     std::unordered_set<std::string_view> requiredExtensions {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-        VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
 
     vk::PhysicalDevice localPhysicalDevice;

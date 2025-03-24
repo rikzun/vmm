@@ -32,12 +32,15 @@ class Render {
         vk::Device m_LogicalDevice;
         vk::SwapchainKHR m_Swapchain;
         vk::CommandPool m_CommandPool;
-        std::vector<vk::CommandBuffer> m_CommandBuffers;
-        vk::PipelineLayout m_PipelineLayout;
+        vk::RenderPass m_RenderPass;
+
+        // vk::PipelineLayout m_PipelineLayout;
         vk::Pipeline m_Pipeline;
 
         std::vector<vk::Image> m_SwapchainImages;
         std::vector<vk::ImageView> m_SwapchainImagesViews;
+        std::vector<vk::CommandBuffer> m_CommandBuffers;
+        std::vector<vk::Framebuffer> m_FrameBuffers;
         std::vector<vk::ShaderModule> m_Shaders;
 
         uint32_t m_QueueGraphicFamilyIndex;
@@ -56,12 +59,16 @@ class Render {
         void createShaderModules();
         void createCommandPool();
         void createCommandBuffers();
+        void createRenderPass();
+        void createFrameBuffers();
         void createSyncObjects();
         
         void createPipeline();
-        void recordCommandBuffer(int index);
+        // void recordCommandBuffer(int index);
 
         vk::Semaphore m_ImageAvailableSemaphore;
-        vk::Semaphore m_RenderFinishedSemaphore;
+        vk::Semaphore m_SubmitSemaphore;
         vk::Fence m_RenderFinishedFence;
 };
+
+vk::Extent2D getWindowSize(SDL_Window* window);

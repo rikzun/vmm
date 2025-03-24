@@ -1,4 +1,5 @@
 #include "render.h"
+#include "render_utils.h"
 
 void Render::selectSwapcianResources() {
     m_Logger.info("Selecting Swapchain Resources");
@@ -21,10 +22,10 @@ void Render::selectSwapcianResources() {
         viewInfo.format = vk::Format::eB8G8R8A8Unorm;
         viewInfo.components = vk::ComponentSwizzle::eIdentity;
         viewInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
-        viewInfo.subresourceRange.baseMipLevel = 0;
         viewInfo.subresourceRange.levelCount = 1;
-        viewInfo.subresourceRange.baseArrayLayer = 0;
         viewInfo.subresourceRange.layerCount = 1;
+        // viewInfo.subresourceRange.baseMipLevel = 0;
+        // viewInfo.subresourceRange.baseArrayLayer = 0;
 
         vk::ImageView imageView = VK_ERROR_CHECK(
             m_LogicalDevice.createImageView(viewInfo),

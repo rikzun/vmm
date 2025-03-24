@@ -1,4 +1,6 @@
 #include "render.h"
+#include "render_utils.h"
+#include <sstream>
 
 std::vector<char> loadFile(const char* filePath) {
     std::ifstream file = std::ifstream(filePath, std::ios::binary | std::ios::ate);

@@ -1,4 +1,5 @@
 #include "render.h"
+#include "render_utils.h"
 
 VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 	vk::DebugUtilsMessageSeverityFlagBitsEXT messageSeverity,

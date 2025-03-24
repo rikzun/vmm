@@ -1,4 +1,5 @@
 #include "render.h"
+#include "render_utils.h"
 
 void Render::createLogicalDevice() {
     m_Logger.info("Creating Logical Device");
@@ -20,7 +21,7 @@ void Render::createLogicalDevice() {
         queueCreateInfos.push_back(presentQueueCreateInfo);
     }
 
-    vk::PhysicalDeviceDynamicRenderingFeaturesKHR deviceDynamicRenderingFeatures = { VK_TRUE };
+    // vk::PhysicalDeviceDynamicRenderingFeaturesKHR deviceDynamicRenderingFeatures = { VK_TRUE };
     std::vector<const char*> requiredExtensions { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
     vk::DeviceCreateInfo deviceCreateInfo = {};
@@ -28,7 +29,7 @@ void Render::createLogicalDevice() {
 	deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
 	deviceCreateInfo.enabledExtensionCount = CONTAINER_COUNT(requiredExtensions);
 	deviceCreateInfo.ppEnabledExtensionNames = requiredExtensions.data();
-	deviceCreateInfo.pNext = &deviceDynamicRenderingFeatures;
+	// deviceCreateInfo.pNext = &deviceDynamicRenderingFeatures;
 
     vk::Device logicalDevice = VK_ERROR_CHECK(
         m_PhysicalDevice.createDevice(deviceCreateInfo),
