@@ -1,11 +1,11 @@
 #include "render.h"
 
-void Render::createSwapchain() {
-    m_Logger.info("Creating Swapchain");
+void Render::createSwapchain(vk::Extent2D& windowSize) {
+    spdlog::info("Creating Swapchain");
 
     vk::SurfaceCapabilitiesKHR surfaceCapabilities = VK_ERROR_CHECK(
         m_PhysicalDevice.getSurfaceCapabilitiesKHR(m_Surface),
-        "Physical device capabilities getting caused an error"
+        "Physical Device capabilities getting caused an error"
     );
 
     uint32_t minImageCount = surfaceCapabilities.minImageCount + 1;
@@ -15,16 +15,14 @@ void Render::createSwapchain() {
 
     vk::Extent2D extent = surfaceCapabilities.currentExtent;
     if (extent.height == UINT32_MAX || extent.width == UINT32_MAX) {
-        vk::Extent2D window = getWindowSize(m_Window);
-
         extent.width = std::min(
             surfaceCapabilities.maxImageExtent.width,
-            std::max(surfaceCapabilities.minImageExtent.width, window.width)
+            std::max(surfaceCapabilities.minImageExtent.width, windowSize.width)
         );
 
         extent.height = std::min(
             surfaceCapabilities.maxImageExtent.height,
-            std::max(surfaceCapabilities.minImageExtent.height, window.height)
+            std::max(surfaceCapabilities.minImageExtent.height, windowSize.height)
         );
     }
 
@@ -39,13 +37,13 @@ void Render::createSwapchain() {
     swapchainCreateInfo.preTransform = surfaceCapabilities.currentTransform;
     swapchainCreateInfo.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
     swapchainCreateInfo.presentMode = vk::PresentModeKHR::eMailbox;
-    swapchainCreateInfo.clipped = VK_TRUE;
+    swapchainCreateInfo.clipped = vk::True;
     swapchainCreateInfo.oldSwapchain = m_Swapchain;
 
     if (m_QueueGraphicFamilyIndex != m_QueuePresentFamilyIndex) {
         uint32_t queue[2] = {
-            static_cast<uint32_t>(m_QueueGraphicFamilyIndex),
-            static_cast<uint32_t>(m_QueuePresentFamilyIndex)
+            m_QueueGraphicFamilyIndex,
+            m_QueuePresentFamilyIndex
         };
         
         swapchainCreateInfo.imageSharingMode = vk::SharingMode::eConcurrent;
@@ -57,11 +55,10 @@ void Render::createSwapchain() {
         swapchainCreateInfo.pQueueFamilyIndices = &m_QueueGraphicFamilyIndex;
     }
 
-    vk::SwapchainKHR swapchainResult = VK_ERROR_CHECK(
+    m_Swapchain = VK_ERROR_CHECK(
         m_LogicalDevice.createSwapchainKHR(swapchainCreateInfo),
         "Swapchain creating caused an error"
     );
 
-    m_Logger.info("Swapchain was created successfully");
-    m_Swapchain = swapchainResult;
+    spdlog::info("Swapchain was created successfully");
 }

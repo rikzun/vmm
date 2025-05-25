@@ -1,6 +1,5 @@
 #include "render.h"
 #include "render_utils.h"
-#include <sstream>
 
 std::vector<char> loadFile(const char* filePath) {
     std::ifstream file = std::ifstream(filePath, std::ios::binary | std::ios::ate);
@@ -23,7 +22,7 @@ std::vector<char> loadFile(const char* filePath) {
 }
 
 void Render::createShaderModules() {
-	m_Logger.info("Creating Shaders Modules");
+	spdlog::info("Creating Shader Modules");
 
     std::vector<char> vertexContent = loadFile("../../shaders/basic_vert.spv");
 	std::vector<char> fragmentContent = loadFile("../../shaders/basic_frag.spv");
@@ -36,16 +35,15 @@ void Render::createShaderModules() {
 	fragmentInfo.codeSize = fragmentContent.size();
 	fragmentInfo.pCode = reinterpret_cast<uint32_t*>(fragmentContent.data());
 
-	vk::ShaderModule vertexShader = VK_ERROR_CHECK(
+	m_VertexShader = VK_ERROR_CHECK(
 		m_LogicalDevice.createShaderModule(vertexInfo),
 		"Vertex Shader Module creating caused an error"
 	);
 
-	vk::ShaderModule fragmentShader = VK_ERROR_CHECK(
+	m_FragmentShader = VK_ERROR_CHECK(
 		m_LogicalDevice.createShaderModule(fragmentInfo),
 		"Fragment Shader Module creating caused an error"
 	);
 
-	m_Logger.info("Shaders Modules was created successfully");
-	m_Shaders = { vertexShader, fragmentShader };
+	spdlog::info("Shader Modules were created successfully");
 }

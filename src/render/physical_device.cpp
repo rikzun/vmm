@@ -1,9 +1,8 @@
 #include "render.h"
 #include "render_utils.h"
-#include <unordered_set>
 
 void Render::selectPhysicalDevice() {
-    m_Logger.info("Select Physical Device");
+    spdlog::info("Select Physical Device");
 
     std::vector<vk::PhysicalDevice> physicalDevices = VK_ERROR_AND_EMPRY_CHECK(
         m_Instance.enumeratePhysicalDevices(),
@@ -29,26 +28,24 @@ void Render::selectPhysicalDevice() {
         std::unordered_set<std::string_view> availableExtensions;
         INSERT_ELEMENTS_M(availableExtensions, supportedExtensions, extensionName);
 
-        m_Logger.info(
-            std::format(
-                "Check required extensions for {} ({})",
-                properties.deviceName.data(),
-                properties.deviceID
-            )
+        spdlog::info(
+            "Check required extensions for {} ({})",
+            properties.deviceName.data(),
+            properties.deviceID
         );
 
         bool requiredExtensionsSupported = true;
         for (std::string_view requiredExtension : requiredExtensions) {
             if (availableExtensions.contains(requiredExtension)) {
-                m_Logger.info(std::format("  + {}", requiredExtension));
+                spdlog::info("  + {}", requiredExtension);
             } else {
-                m_Logger.info(std::format("  - {}", requiredExtension));
+                spdlog::info("  - {}", requiredExtension);
                 requiredExtensionsSupported = false;
             }
         }
 
         if (requiredExtensionsSupported && !localPhysicalDevice) {
-            m_Logger.info("  DEVICE SELECTED");
+            spdlog::info("  DEVICE SELECTED");
             localPhysicalDevice = physicalDevice;
         }
     }

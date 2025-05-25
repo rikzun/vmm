@@ -1,46 +1,44 @@
 #include "render.h"
 #include "render_utils.h"
 
-VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+VKAPI_ATTR vk::Bool32 VKAPI_CALL debugCallback(
 	vk::DebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 	vk::DebugUtilsMessageTypeFlagsEXT messageType,
 	const vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData,
 	void* pUserData
 ) {
 	if (messageSeverity & vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo) {
-		static_cast<Logger*>(pUserData)->info(std::format("[VULKAN] {}", pCallbackData->pMessage));
+		spdlog::info("[{}] {}", spdlog::fmt_lib::format(fg(spdlog::fmt_lib::terminal_color::red), "vulkan"), pCallbackData->pMessage);
 	} else if (messageSeverity & vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning) {
-		static_cast<Logger*>(pUserData)->warning(std::format("[VULKAN] {}", pCallbackData->pMessage));
+		spdlog::warn("[{}] {}", spdlog::fmt_lib::format(fg(spdlog::fmt_lib::terminal_color::red), "vulkan"), pCallbackData->pMessage);
 	} else if (messageSeverity & vk::DebugUtilsMessageSeverityFlagBitsEXT::eError) {
-		static_cast<Logger*>(pUserData)->error(std::format("[VULKAN] {}", pCallbackData->pMessage));
+		spdlog::error("[{}] {}", spdlog::fmt_lib::format(fg(spdlog::fmt_lib::terminal_color::red), "vulkan"), pCallbackData->pMessage);
 	}
 
-	return VK_FALSE;
+	return vk::False;
 }
 
 void Render::createDebugMessenger() {
     if (!m_DebugLayer) return;
 
-	m_Logger.info("Creating Debug Messenger");
+	spdlog::info("Creating Debug Messenger");
 	m_Dispatcher.init(m_Instance, vkGetInstanceProcAddr);
 
-    vk::DebugUtilsMessengerCreateInfoEXT createInfo {};
-	createInfo.pfnUserCallback = debugCallback;
-	createInfo.pUserData = &m_Logger;
-	createInfo.messageSeverity =
+    vk::DebugUtilsMessengerCreateInfoEXT debugMessengerCreateInfo {};
+	debugMessengerCreateInfo.pfnUserCallback = debugCallback;
+	debugMessengerCreateInfo.messageSeverity =
 		vk::DebugUtilsMessageSeverityFlagBitsEXT::eError |
 		vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo |
 		vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning;
-	createInfo.messageType =
+	debugMessengerCreateInfo.messageType =
 		vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
 		vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance |
 		vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation;
 
-	vk::DebugUtilsMessengerEXT debugMessenger = VK_ERROR_CHECK(
-		m_Instance.createDebugUtilsMessengerEXT(createInfo, nullptr, m_Dispatcher),
+	m_DebugMessenger = VK_ERROR_CHECK(
+		m_Instance.createDebugUtilsMessengerEXT(debugMessengerCreateInfo, nullptr, m_Dispatcher),
 		"Debug Messenger creating caused an error"
 	);
-
-	m_Logger.info("Debug Messenger was created successfully");
-    m_DebugMessenger = debugMessenger;
+	
+	spdlog::info("Debug Messenger was created successfully");
 }

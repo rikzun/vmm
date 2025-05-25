@@ -1,22 +1,22 @@
 #pragma once
 
-#define VK_ERROR_CHECK(call, message)                 \
+#define VK_ERROR_CHECK(call, msg)                 \
 ([&]() -> decltype(auto) {                            \
     auto resultValue = (call);                        \
     if (resultValue.result != vk::Result::eSuccess) { \
-        throw std::runtime_error(message);            \
+        throw std::runtime_error(msg);            \
     }                                                 \
     return resultValue.value;                         \
 }())
 
-#define VK_ERROR_AND_EMPRY_CHECK(call, message1, message2) \
+#define VK_ERROR_AND_EMPRY_CHECK(call, msg1, msg2) \
 ([&]() -> decltype(auto) {                                 \
     auto resultValue = (call);                             \
     if (resultValue.result != vk::Result::eSuccess) {      \
-        throw std::runtime_error(message1);                \
+        throw std::runtime_error(msg1);                \
     }                                                      \
     if (resultValue.value.empty()) {                       \
-        throw std::runtime_error(message2);                \
+        throw std::runtime_error(msg2);                \
     }                                                      \
     return resultValue.value;                              \
 }())

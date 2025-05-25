@@ -1,24 +1,30 @@
 #include "render.h"
 #include "render_utils.h"
 
-void Render::createFrameBuffers() {
-    vk::Extent2D extent = getWindowSize(m_Window);
+void Render::createFrameBuffers(vk::Extent2D& windowSize) {
+    spdlog::info("Creating Frame Buffers");
 
-    vk::FramebufferCreateInfo createInfo {};
-    createInfo.height = extent.height;
-    createInfo.width = extent.width;
-    createInfo.renderPass = m_RenderPass;
-    createInfo.layers = 1;
-    createInfo.attachmentCount = 1;
+    vk::FramebufferCreateInfo frameBufferCreateInfo {};
+    frameBufferCreateInfo.height = windowSize.height;
+    frameBufferCreateInfo.width = windowSize.width;
+    frameBufferCreateInfo.renderPass = m_RenderPass;
+    frameBufferCreateInfo.layers = 1;
+    frameBufferCreateInfo.attachmentCount = 1;
+
+    std::vector<vk::Framebuffer> frameBuffers {};
+    frameBuffers.reserve(m_SwapchainImagesViews.size());
 
     for (auto& imageView : m_SwapchainImagesViews) {
-        createInfo.pAttachments = &imageView;
+        frameBufferCreateInfo.pAttachments = &imageView;
 
         vk::Framebuffer frameBuffer = VK_ERROR_CHECK(
-            m_LogicalDevice.createFramebuffer(createInfo),
-            "createFramebuffer"
+            m_LogicalDevice.createFramebuffer(frameBufferCreateInfo),
+            "Frame Buffer creating caused an error"
         );
 
-        m_FrameBuffers.push_back(frameBuffer);
+        frameBuffers.push_back(frameBuffer);
     }
+
+    m_FrameBuffers = frameBuffers;
+    spdlog::info("Frame Buffer created successfully");
 }

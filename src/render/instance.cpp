@@ -1,9 +1,8 @@
 #include "render.h"
 #include "render_utils.h"
-#include <unordered_set>
 
 void Render::createInstance() {
-    m_Logger.info("Creating Instance");
+    spdlog::info("Creating Instance");
 
     uint32_t version = VK_ERROR_CHECK(
         vk::enumerateInstanceVersion(),
@@ -15,16 +14,14 @@ void Render::createInstance() {
     appInfo.applicationVersion = VK_MAKE_VERSION(PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR, PROJECT_VERSION_PATCH);
     appInfo.apiVersion = VK_MAKE_API_VERSION(0, PROJECT_VK_VERSION_MAJOR, PROJECT_VK_VERSION_MINOR, PROJECT_VK_VERSION_PATCH);
 
-    m_Logger.info(
-        std::format(
-            "Vulkan sys: {}.{}.{} app: {}.{}.{}",
-            VK_API_VERSION_MAJOR(version),
-            VK_API_VERSION_MINOR(version),
-            VK_API_VERSION_PATCH(version),
-            PROJECT_VK_VERSION_MAJOR,
-            PROJECT_VK_VERSION_MINOR,
-            PROJECT_VK_VERSION_PATCH
-        )
+    spdlog::info(
+        "Vulkan sys: {}.{}.{} app: {}.{}.{}",
+        VK_API_VERSION_MAJOR(version),
+        VK_API_VERSION_MINOR(version),
+        VK_API_VERSION_PATCH(version),
+        PROJECT_VK_VERSION_MAJOR,
+        PROJECT_VK_VERSION_MINOR,
+        PROJECT_VK_VERSION_PATCH
     );
 
     std::vector<vk::LayerProperties> instanceSupportedLayers = VK_ERROR_AND_EMPRY_CHECK(
@@ -51,11 +48,11 @@ void Render::createInstance() {
     m_DebugLayer = supportedLayers.contains("VK_LAYER_KHRONOS_validation");
 
     if (m_DebugLayer) {
-        m_Logger.info("Debug layer supported");
+        spdlog::info("Debug layer supported");
         requiredExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         requiredLayers.push_back("VK_LAYER_KHRONOS_validation");
     } else {
-        m_Logger.info("Debug layer not supported");
+        spdlog::info("Debug layer not supported");
     }
 
     uint32_t sdlRequiredExtensionsCount = 0;
@@ -64,26 +61,26 @@ void Render::createInstance() {
         requiredExtensions.push_back(sdlRequiredExtensions[i]);
     }
 
-    m_Logger.info("Check required layers support");
+    spdlog::info("Check required layers support");
     bool requiredLayersSupported = true;
 
     for (std::string_view requiredLayer : requiredLayers) {
         if (supportedLayers.contains(requiredLayer)) {
-            m_Logger.info(std::format("  + {}", requiredLayer));
+            spdlog::info("  + {}", requiredLayer);
         } else {
-            m_Logger.info(std::format("  - {}", requiredLayer));
+            spdlog::info("  - {}", requiredLayer);
             requiredLayersSupported = false;
         }
     }
 
-    m_Logger.info("Check required extensions support");
+    spdlog::info("Check required extensions support");
     bool requiredExtensionsSupported = true;
 
     for (std::string_view requiredExtension : requiredExtensions) {
         if (supportedExtensions.contains(requiredExtension)) {
-            m_Logger.info(std::format("  + {}", requiredExtension));
+            spdlog::info("  + {}", requiredExtension);
         } else {
-            m_Logger.info(std::format("  - {}", requiredExtension));
+            spdlog::info("  - {}", requiredExtension);
             requiredExtensionsSupported = false;
         }
     }
@@ -91,18 +88,17 @@ void Render::createInstance() {
     if (!requiredLayersSupported) throw std::runtime_error("Not all required layers are supported");
     if (!requiredExtensionsSupported) throw std::runtime_error("Not all required extensions are supported");
 
-    vk::InstanceCreateInfo createInfo {};
-    createInfo.pApplicationInfo = &appInfo;
-    createInfo.enabledLayerCount = CONTAINER_COUNT(requiredLayers);
-    createInfo.ppEnabledLayerNames = requiredLayers.data();
-    createInfo.enabledExtensionCount = CONTAINER_COUNT(requiredExtensions);
-    createInfo.ppEnabledExtensionNames = requiredExtensions.data();
+    vk::InstanceCreateInfo instanceCreateInfo {};
+    instanceCreateInfo.pApplicationInfo = &appInfo;
+    instanceCreateInfo.enabledLayerCount = CONTAINER_COUNT(requiredLayers);
+    instanceCreateInfo.ppEnabledLayerNames = requiredLayers.data();
+    instanceCreateInfo.enabledExtensionCount = CONTAINER_COUNT(requiredExtensions);
+    instanceCreateInfo.ppEnabledExtensionNames = requiredExtensions.data();
 
-    vk::Instance instance = VK_ERROR_CHECK(
-        vk::createInstance(createInfo),
+    m_Instance = VK_ERROR_CHECK(
+        vk::createInstance(instanceCreateInfo),
         "Instance creating caused an error"
     );
 
-    m_Logger.info("Instance was created successfully");
-    m_Instance = instance;
+    spdlog::info("Instance was created successfully");
 }

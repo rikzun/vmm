@@ -2,7 +2,7 @@
 #include "render_utils.h"
 
 void Render::createLogicalDevice() {
-    m_Logger.info("Creating Logical Device");
+    spdlog::info("Creating Logical Device");
 
     const float queuePriority = 1.0f;
     std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
@@ -21,23 +21,22 @@ void Render::createLogicalDevice() {
         queueCreateInfos.push_back(presentQueueCreateInfo);
     }
 
-    // vk::PhysicalDeviceDynamicRenderingFeaturesKHR deviceDynamicRenderingFeatures = { VK_TRUE };
-    std::vector<const char*> requiredExtensions { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+    std::vector<const char*> requiredExtensions {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    };
 
-    vk::DeviceCreateInfo deviceCreateInfo = {};
+    vk::DeviceCreateInfo deviceCreateInfo {};
 	deviceCreateInfo.queueCreateInfoCount = CONTAINER_COUNT(queueCreateInfos);
 	deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
 	deviceCreateInfo.enabledExtensionCount = CONTAINER_COUNT(requiredExtensions);
 	deviceCreateInfo.ppEnabledExtensionNames = requiredExtensions.data();
-	// deviceCreateInfo.pNext = &deviceDynamicRenderingFeatures;
 
-    vk::Device logicalDevice = VK_ERROR_CHECK(
+    m_LogicalDevice = VK_ERROR_CHECK(
         m_PhysicalDevice.createDevice(deviceCreateInfo),
         "Logical Device creating caused an error"
     );
 
-    m_LogicalDevice = logicalDevice;
     m_GraphicQueue = m_LogicalDevice.getQueue(m_QueueGraphicFamilyIndex, 0);
     m_PresentQueue = m_LogicalDevice.getQueue(m_QueuePresentFamilyIndex, 0);
-    m_Logger.info("Logical Device was created successfully");
+    spdlog::info("Logical Device was created successfully");
 }

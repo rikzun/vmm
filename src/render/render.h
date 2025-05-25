@@ -5,22 +5,25 @@
 #include <SDL3/SDL_vulkan.h>
 #include <optional>
 #include <unordered_set>
-#include "render_utils.h"
 #include <sstream>
 #include <iomanip>
 #include <sstream>
-#include "../logger.h"
+#include <fstream>
+#include <unordered_set>
+#include <spdlog/spdlog.h>
+#include <spdlog/fmt/bundled/color.h>
+#include "render_utils.h"
 
 class Render {
     public:
-        Render(SDL_Window* window, Logger& logger);
+        Render(SDL_Window* window);
         ~Render();
 
-        void init();
-        void draw();
+        void init(vk::Extent2D& windowSize);
+        void resize(vk::Extent2D& newWindowSize);
+        void draw(vk::Extent2D& windowSize);
 
     private:
-        Logger& m_Logger;
         bool m_DebugLayer = false;
         vk::detail::DispatchLoaderDynamic m_Dispatcher;
         vk::DebugUtilsMessengerEXT m_DebugMessenger;
@@ -33,20 +36,20 @@ class Render {
         vk::SwapchainKHR m_Swapchain;
         vk::CommandPool m_CommandPool;
         vk::RenderPass m_RenderPass;
-
-        // vk::PipelineLayout m_PipelineLayout;
         vk::Pipeline m_Pipeline;
 
         std::vector<vk::Image> m_SwapchainImages;
         std::vector<vk::ImageView> m_SwapchainImagesViews;
         std::vector<vk::CommandBuffer> m_CommandBuffers;
         std::vector<vk::Framebuffer> m_FrameBuffers;
-        std::vector<vk::ShaderModule> m_Shaders;
 
         uint32_t m_QueueGraphicFamilyIndex;
         vk::Queue m_GraphicQueue;
         uint32_t m_QueuePresentFamilyIndex;
         vk::Queue m_PresentQueue;
+
+        vk::ShaderModule m_VertexShader;
+        vk::ShaderModule m_FragmentShader;
 
         void createInstance();
         void createDebugMessenger();
@@ -54,21 +57,18 @@ class Render {
         void selectPhysicalDevice();
         void selectQueueFamilyIndexes();
         void createLogicalDevice();
-        void createSwapchain();
-        void selectSwapcianResources();
+        void createSwapchain(vk::Extent2D& windowSize);
+        void selectSwapchainResources();
         void createShaderModules();
         void createCommandPool();
         void createCommandBuffers();
         void createRenderPass();
-        void createFrameBuffers();
+        void createFrameBuffers(vk::Extent2D& windowSize);
         void createSyncObjects();
         
         void createPipeline();
-        // void recordCommandBuffer(int index);
 
         vk::Semaphore m_ImageAvailableSemaphore;
         vk::Semaphore m_SubmitSemaphore;
         vk::Fence m_RenderFinishedFence;
 };
-
-vk::Extent2D getWindowSize(SDL_Window* window);
